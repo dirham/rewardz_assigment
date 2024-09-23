@@ -15,6 +15,12 @@ You now can access the service on this <a href="http://localhost:8000">link</a> 
 
 You also could create student account through this <a href="http://localhost:8000/register/">link</a>. Currently all registerd student will be active and could be used for login
 
+Features:
+- Automatic calculate fee (done)
+- Search book using open api (done)
+- Retriview book cover (done)
+- Rent a book (currently assign to the librarian user, BUG)
+
 ### Things not to expect on this project:
 This project is far from perfect,this the thing we expect to be added later:
 - Separated the settigns (base.py, dev.py and prod.py)
