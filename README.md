@@ -8,15 +8,10 @@ You need Docker and docker compose installed before run the command below:
 - Go to rewardz_assigment `cd rewardz_assigment`
 - run `docker compose up -d`
 - now the applications is running on port 8000
+- create super user with: `docker exec -it book_rentalz sh -c "python manage.py createsuperuser"`
 
 
 You now can access the service on this <a href="http://localhost:8000">link</a> or visit admin page <a href="http://localhost:8000">here</a>
-
-default super admin account:
-```
-username: testing
-password: pass123456
-```
 
 You also could create student account through this <a href="http://localhost:8000/register/">link</a>. Currently all registerd student will be active and could be used for login
 
