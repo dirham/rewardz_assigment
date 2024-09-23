@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block navbar %} 
+    {% include 'navbar.html' %} 
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center flex-column">
+    <div class="row mt-4">
+        <h2 class="py-4 text-center">Rented Books</h2>
+        {% for rental in page_obj %}
+        <div class="col-md-4">
+            <div class="card mb-3 d-flex flex-row">
+                {% if rental.book.olid %}
+                <img
+                    src="https://covers.openlibrary.org/b/olid/{{ rental.book.olid }}-M.jpg"
+                    class="card-img-left img-fluid"
+                    alt="{{ rental.book.title }} cover"
+                    style="max-width: 9rem; height: 14rem"
+                />
+                {% else %}
+                <img
+                    src="/static/images/no-image.png"
+                    alt="No cover available"
+                    class="card-img-left img-fluid bg-light"
+                    style="max-width: 9rem; height: 14rem"
+                />
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ rental.book.title }}</h5>
+                    <p class="card-text">
+                        <strong>Rented By</strong> {{ rental.user.username }}<br />
+                        <strong>Rent Date:</strong> {{ rental.start_date }} 
+                    </p>
+                </div> <!-- Close card-body -->
+            </div> <!-- Close card -->
+        </div> <!-- Close col-md-4 -->
+        {% endfor %}
+    </div> <!-- Close row -->
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1" aria-label="First">
+                    <span aria-hidden="true">&laquo; First</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            </li>
+            {% endif %}
+
+            <li class="page-item disabled">
+                <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            </li>
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div> <!-- Close flex column -->
+
+{% endblock %} 
+
+{% block custom_js %}
+<script src="/static/js/holder.min.js"></script>
+{% endblock %}

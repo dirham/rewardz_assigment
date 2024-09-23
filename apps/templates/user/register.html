@@ -1,0 +1,28 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container">
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="col col-md-5">
+       {% include '__messages.html' %} 
+      <h2>Sign Up</h2>
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %} {% for field in form %}
+        <div class="mb-3">
+          {{ field.label_tag }} {{ field }}
+          <!-- Add the Bootstrap class -->
+          {% if field.errors %}
+          <div class="form-text text-danger"> 
+            {% for error in field.errors %} 
+            
+                {{error}}
+            
+            {% endfor %}
+        </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+        <input type="submit" class="btn btn-primary" value="Register" />
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

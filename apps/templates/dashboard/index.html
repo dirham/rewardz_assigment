@@ -1,0 +1,241 @@
+{% extends 'base.html' %} 
+
+{% block navbar %} 
+    {% include 'navbar.html' %} 
+{%endblock %} 
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center flex-column">
+  <div class="col col-md-5 py-3">
+    {% include '__messages.html' %}
+    <form method="get" class="d-flex">
+      <div class="form-floating flex-grow-1 mb-0">
+        <input
+          type="text"
+          class="form-control"
+          id="floatingInputGroup1"
+          placeholder="search"
+          name="q"
+        />
+        <label for="floatingInputGroup1">Search for book title</label>
+      </div>
+      <button type="submit" class="btn btn-primary ms-2">Search</button>
+    </form>
+  </div>
+
+  <div class="row mt-4">
+    {% if data.docs %} 
+    {% for book in data.docs %}
+    <div class="col-md-4">
+      <div class="card mb-3 d-flex flex-row">
+        {% if book.cover_edition_key %}
+        <img
+          src="https://covers.openlibrary.org/b/olid/{{ book.cover_edition_key }}-M.jpg"
+          class="card-img-left img-fluid"
+          alt="{{ book.title }} cover"
+          style="max-width: 9rem; height: 14rem"
+        />
+        {% else %}
+        <img
+          src="/static/images/no-image.png"
+          alt="..."
+          class="card-img-left img-fluid bg-light"
+          alt="{{ book.title }} cover"
+          style="max-width: 9rem; height: 14rem"
+        />
+        {% endif %}
+        <div class="card-body position-relative">
+          <!-- Set the card body to relative -->
+          <h5 class="card-title">{{ book.title }}</h5>
+          <p class="card-text">
+            <strong>Authors:</strong> {{ book.author_name|join:", " }}<br />
+            <strong>Page Count:</strong>
+            {% if book.number_of_pages %} {{ book.number_of_pages }} {% else %}
+            {{ book.number_of_pages_median }} {% endif %}
+          </p>
+          <div class="position-absolute m-2" style="bottom: 0; right: 0">
+            <!-- Stick the button to bottom-right -->
+            <button
+              id="rentBtn"
+              class="btn btn-outline-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#rentModal"
+              data-title="{{ book.title }}"
+              data-author="{{ book.author_name|join:', ' }}"
+              data-pages="{% if book.number_of_pages %}{{ book.number_of_pages }}{% else %}{{ book.number_of_pages_median }}{% endif %}"
+              data-olid="{{ book.cover_edition_key }}"
+            >
+              Rent This Book
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% endfor %} {% else %}
+    <div class="col-md-12">
+      <p>No results found.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %} {% block modal %}
+<div
+  class="modal fade"
+  id="rentModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="rentModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Review book rent</h5>
+      </div>
+      <form action="{% url 'process_rent' %}" id="rentForm" method="post">
+        <div class="modal-body">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="student" class="form-label">To student</label>
+            <input
+              type="text"
+              class="form-control"
+              id="student"
+              placeholder="type student name"
+              onchange="get_student(this.value);"
+            />
+            <input type="hidden" name="student_id" value="" id="studentInput">
+          </div>
+          <div class="mb-3">
+            <label for="bookTitle" class="form-label">Book Title</label>
+            <input
+              type="text"
+              class="form-control"
+              id="bookTitle"
+              name="book_title"
+              readonly
+            />
+          </div>
+          <div class="mb-3">
+            <label for="bookAuthor" class="form-label">Author(s)</label>
+            <input
+              type="text"
+              class="form-control"
+              id="bookAuthor"
+              name="book_author"
+              readonly
+            />
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <label for="bookPages" class="form-label">Page Count</label>
+              <input
+                type="text"
+                class="form-control"
+                id="bookPages"
+                name="book_pages"
+                readonly
+              />
+            </div>
+            <div class="col">
+              <label for="fee" class="form-label">Charge Fee ($)</label>
+              <span
+                class="d-inline-block"
+                tabindex="0"
+                data-bs-toggle="popover"
+                data-bs-trigger="hover focus"
+                data-bs-content="ONLY applicable when you exceed the free inital month"
+              >
+                <span class="badge rounded-pill bg-dark">?</span>
+              </span>
+              <input type="text" class="form-control" id="fee" disabled />
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="olid" class="form-label">OLID</label>
+            <input
+              type="text"
+              class="form-control"
+              id="olid"
+              name="olid"
+              readonly
+            />
+          </div>
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Confirm Rent</button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block custom_js %}
+<script>
+  function get_student(name) {
+
+    
+    const url = `/get_student/?name=${encodeURIComponent(name)}`;
+
+    fetch(url, {
+        method: 'GET', 
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Update the UI with the response data
+        // For example, you could display student information in a div
+        let studentIn = document.getElementById('studentInput');
+        studentIn.value = data.id // Adjust based on your response structure
+    })
+    .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    let popoverTriggerList = [].slice.call(
+      document.querySelectorAll('[data-bs-toggle="popover"]')
+    );
+    let popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+      return new bootstrap.Popover(popoverTriggerEl);
+    });
+
+    
+   
+    const rentButtons = document.querySelectorAll("#rentBtn");
+    rentButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        const title = button.getAttribute("data-title");
+        const author = button.getAttribute("data-author");
+        const pages = button.getAttribute("data-pages");
+        const olid = button.getAttribute("data-olid");
+
+        document.getElementById("bookTitle").value = title;
+        document.getElementById("bookAuthor").value = author;
+        document.getElementById("bookPages").value = pages;
+        if (pages !== "") {
+          document.getElementById("fee").value = Number(pages / 100);
+        }
+        document.getElementById("olid").value = olid;
+      });
+    });
+  });
+</script>
+{% endblock %}
