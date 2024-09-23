@@ -1,5 +1,5 @@
 # Book rental 
-is book rental app that using openlibarary api to search a book and simulate book rentals and calculate the fee automatically for extended rent.
+is a book rental app that using openlibarary api to search a book and simulate book rentals and calculate the fee automatically for extended rent.
 
 ### Up and run using Docker
 You need Docker and docker compose installed before run the command below:
