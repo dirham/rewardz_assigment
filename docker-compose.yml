@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  rentalz:
+    environment:
+      - DJANGO_SUPERUSER_EMAIL=test@test.com
+      - DJANGO_SUPERUSER_USERNAME=testing
+      - DJANGO_SUPERUSER_PASSWORD=pass123456
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: book_rentalz
+    command: sh -c "python3 manage.py migrate --noinput && python3 manage.py collectstatic --noinput && python3 manage.py createsuperuser --noinput && python3 manage.py runserver 0.0.0.0:8000"
+    restart: always
+    volumes:
+      - .:/book_rentals
+    ports:
+      - "8000:8000"
+    # env_file: $ uncomment when we want to use .env
+    #   - .env
+      
